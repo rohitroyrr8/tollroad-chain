@@ -2,7 +2,7 @@
 
 You should read this whole page before attacking the problem, including the part about Docker and your working copy.
 
-The exercise is divided into 4 parts that you should take in order. The 4 parts of the exercise are disclosed bit by bit, and here is the 1st part. The 4 parts are for the same project, this project.
+The exercise is divided into 4 parts that you should take in order. The 4 parts of the exercise are disclosed bit by bit, and here are the 1st and 2nd parts. The 4 parts are for the same project, this project.
 
 This is the beginning of a larger project dedicated to the future payments of [toll roads](https://en.wikipedia.org/wiki/Toll_road). The project, built with Ignite 0.22.1 and CosmJS 0.28.13, is far from complete.
 
@@ -14,7 +14,15 @@ However it already contains:
     $ ignite scaffold single SystemInfo nextOperatorId:uint --no-message
     ```
 
-2. More actions to be disclosed in subsequent parts.
+2. A map of `RoadOperator`s. It was created with:
+
+    ```sh
+    $ ignite scaffold map RoadOperator name token active:bool
+    ```
+
+    The default behavior of the scaffolding command is to have the index of the operator come from `MsgCreateRoadOperator`. However, `index` was removed from `MsgCreateRoadOperator`. That's because when a user creates a new road operator, the user does not choose the ID. Instead, it is chosen by the system on creation. After rebuild, various compilation errors were "fixed" in a lazy way.
+
+3. More actions to be disclosed in subsequent parts.
 
 ## Do now
 
@@ -36,7 +44,8 @@ This is not to save you time. Instead this is to save you mistakes and surprises
 The following steps are in order of increasing difficulty:
 
 1. Adjustments on system info.
-2. More actions to be disclosed in subsequent parts.
+2. Adjustments on road operators.
+3. More actions to be disclosed in subsequent parts.
 
 The tests have been divided into different packages to avoid compilation errors while your project is incomplete.
 
@@ -47,6 +56,25 @@ Adjust `x/tollroad/types/genesis.go` so that the `x/tollroad/genesis_test.go` te
 ```sh
 $ go test github.com/b9lab/toll-road/x/tollroad
 ```
+
+### On road operators
+
+When a road operator is created, its ID has to be taken from `SystemInfo`. For this part, you are going to work only in `x/tollroad/keeper/msg_server_road_operator.go` and in it, only adjust the `CreateRoadOperator` function body. **Not the function signature, not another function, not another file.**
+
+This is what you have to implement:
+
+1. Make sure that the new road operator has its ID taken from `SystemInfo`.
+2. Have this ID returned by the message server function.
+3. Make sure the next id in `SystemInfo` is incremented.
+4. Emit an event with the expected type and attributes.
+
+To confirm, run:
+
+```sh
+$ go test github.com/b9lab/toll-road/x/tollroad/roadoperatorstudent
+```
+
+Look into the `x/tollroad/roadoperatorstudent/msg_server_road_operator_test.go` file to see what is expected, in particular the details of the expected event.
 
 ### On subsequent parts
 
@@ -100,7 +128,8 @@ For your convenience, here are the `go test` commands that the grading scripts w
 
 ```sh
 $ go test github.com/b9lab/toll-road/x/tollroad
-# More tests to be disclosed in subsequent parts
+$ go test github.com/b9lab/toll-road/x/tollroad/roadoperatorstudent
+$ go test github.com/b9lab/toll-road/x/tollroad/uservaultstudent
 ```
 
 Each of them is actually launched from a script, respectively:
@@ -109,10 +138,11 @@ Each of them is actually launched from a script, respectively:
 $ ./x/tollroad/testing.sh
 $ ./x/tollroad/roadoperatorstudent/testing.sh
 $ ./x/tollroad/uservaultstudent/testing.sh
-$ ./testing-cosmjs.sh
 ```
 
 Inside each of them (after disclosure) you can see how much weight is given to each test.
+
+The NPM tests are launched from `./testing-cosmjs.sh` and each of the 4 tests has the same weight.
 
 In turn, these 4 `testing` scripts are launched from this script:
 

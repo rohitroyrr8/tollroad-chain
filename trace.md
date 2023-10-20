@@ -7,3 +7,7 @@ Built with Ignite v0.22.1.
 * Run `docker run --rm -it -v $(pwd):/exam -w /exam exam_i ignite scaffold single SystemInfo nextOperatorId:uint --no-message`
 * Make it not nullable in genesis, fix compilation errors and tests.
 * Run `docker run --rm -it -v $(pwd):/exam -w /exam exam_i ignite chain serve` and stop.
+* Run `docker run --rm -it -v $(pwd):/exam -w /exam exam_i ignite scaffold map RoadOperator name token active:bool`.
+* Remove `index` from `MsgCreateRoadOperator`, and change Protobuf indices. Add `string index` to `MsgCreateRoadOperatorResponse`.
+* Run `docker run --rm -it -v $(pwd):/exam -w /exam exam_i ignite chain serve` and stop.
+* Fix compilation and test errors around missing `Index`.
