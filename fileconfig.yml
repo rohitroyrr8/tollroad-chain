@@ -13,6 +13,8 @@ configuration:
         - proto/tollroad/params.proto
         - proto/tollroad/road_operator.proto
         - proto/tollroad/system_info.proto
+        - testutil/mock_types/bank_escrow_helpers.go
+        - testutil/mock_types/expected_keepers.go
         - testutil/network/network.go
         - testutil/nullify/nullify.go
         - testutil/sample/sample.go
@@ -51,7 +53,10 @@ configuration:
         - x/tollroad/types/road_operator.pb.go
         - x/tollroad/types/system_info.pb.go
         - x/tollroad/types/types.go
+        - x/tollroad/uservaultstudent/grpc_query_user_vault_test.go
+        - x/tollroad/uservaultstudent/msg_server_user_vault_test.go
         - x/tollroad/uservaultstudent/testing.sh
+        - x/tollroad/uservaultstudent/tx_user_vault_test.go
         - x/tollroad/genesis_student_test.go
         - x/tollroad/module.go
         - x/tollroad/testing.sh

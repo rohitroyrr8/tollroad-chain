@@ -2,7 +2,7 @@
 
 You should read this whole page before attacking the problem, including the part about Docker and your working copy.
 
-The exercise is divided into 4 parts that you should take in order. The 4 parts of the exercise are disclosed bit by bit, and here are the 1st and 2nd parts. The 4 parts are for the same project, this project.
+The exercise is divided into 4 parts that you should take in order. The 4 parts of the exercise are disclosed bit by bit, and here are the 1st, 2nd and 3rd parts. The 4 parts are for the same project, this project.
 
 This is the beginning of a larger project dedicated to the future payments of [toll roads](https://en.wikipedia.org/wiki/Toll_road). The project, built with Ignite 0.22.1 and CosmJS 0.28.13, is far from complete.
 
@@ -22,7 +22,7 @@ However it already contains:
 
     The default behavior of the scaffolding command is to have the index of the operator come from `MsgCreateRoadOperator`. However, `index` was removed from `MsgCreateRoadOperator`. That's because when a user creates a new road operator, the user does not choose the ID. Instead, it is chosen by the system on creation. After rebuild, various compilation errors were "fixed" in a lazy way.
 
-3. More actions to be disclosed in subsequent parts.
+3. More actions to be disclosed in the subsequent part.
 
 ## Do now
 
@@ -45,7 +45,8 @@ The following steps are in order of increasing difficulty:
 
 1. Adjustments on system info.
 2. Adjustments on road operators.
-3. More actions to be disclosed in subsequent parts.
+3. Add a new store type: User vaults.
+4. More actions to be disclosed in the subsequent part.
 
 The tests have been divided into different packages to avoid compilation errors while your project is incomplete.
 
@@ -76,7 +77,132 @@ $ go test github.com/b9lab/toll-road/x/tollroad/roadoperatorstudent
 
 Look into the `x/tollroad/roadoperatorstudent/msg_server_road_operator_test.go` file to see what is expected, in particular the details of the expected event.
 
-### On subsequent parts
+### On user vaults
+
+This part requires more work.
+
+With the operators in place, it is time to move your attention to the users of the road operators. Users are going to keep some tokens in escrow with the operators. The idea is that road operators will eventually be allowed to transfer to themselves some of the tokens that the users have put into escrow "with them".
+
+To keep track of **which user** has put **how much** of **which token denomination** in escrow with **which operator**, you have to add a new type named `UserVault`.
+
+The user vault object has exactly 4 fields, not less, not more. In Protobuf it should be:
+
+```protobuf
+message UserVault {
+    string owner = 1; 
+    string roadOperatorIndex = 2; 
+    string token = 3; 
+    uint64 balance = 4; 
+}
+```
+
+The user vault object's key in the map is the combination of, and in this order, `owner, roadOperatorIndex, token`. This means, for instance, that the future keeper function to get a user vault has this signature:
+
+```go
+func (k Keeper) GetUserVault(ctx sdk.Context, owner string, roadOperatorIndex string, token string) (val types.UserVault, found bool)
+```
+
+In effect, `balance` is the only field that is not part of the object's key.
+
+Additionally, the message to create this vault object should not have the `owner` field, as it is in effect picked from the `creator` field. In Protobuf, the create message is exactly:
+
+```protobuf
+message MsgCreateUserVault {
+    string creator = 1;
+    string roadOperatorIndex = 2;
+    string token = 3;
+    uint64 balance = 4;
+}
+```
+
+It should not be allowed to create another user vault with the same key of `owner, roadOperatorIndex, token`.
+
+Similarly, the message to update the vault picks the owner in the `creator` field. In Protobuf, it looks like `MsgCreateUserVault`:
+
+```protobuf
+message MsgUpdateUserVault {
+    string creator = 1;
+    string roadOperatorIndex = 2;
+    string token = 3;
+    uint64 balance = 4;
+}
+```
+
+`balance` is the only field that can be updated.
+
+And again, the message to delete a vault:
+
+```protobuf
+message MsgDeleteUserVault {
+    string creator = 1;
+    string roadOperatorIndex = 2;
+    string token = 3;
+}
+```
+
+With these objectives in mind, your tasks are as follows.
+
+#### Scaffold the type
+
+So your first task is to add a new mapped type named `UserVault` with `ignite scaffold map`. If you do it right, you can:
+
+1. Use a single Ignite command.
+2. Do minor adjustments on Protobuf objects to match as per the above.
+3. Fix compilation errors that appear after successive rebuilds.
+4. Adjust the functions in `x/tollroad/client/cli/tx_user_vault.go` as per the change in how things need to be called, i.e. replacing `owner` with creator.
+
+#### Handle tokens
+
+With the data structure, the keeper and the messages stuff done, your second task is to handle the tokens by calling the bank.
+
+We have prepared mocks in `testutil/mock_types/expected_keepers.go`. The `MockBankEscrowKeeper` is a mock of a yet-to-be-created `type BankEscrowKeeper interface`. You have to:
+
+1. In `x/tollroad/types/expected_keepers.go`, declare this interface.
+2. Have it declare the two bank functions that transfer tokens between module and accounts.
+
+With this done, apply what you learned in the course so that:
+
+1. Your keeper has the permissions and the capability to transfer tokens between users and its module.
+2. You use the mock `MockBankEscrowKeeper` in the **test** keeper initialization. To find out where this takes place, follow through the set up of tests.
+3. Your keeper has to be able to actually transfer tokens between the user and the module:
+    1. On creating the vault:
+        1. The `balance` amount is transferred from the user to the module.
+        2. If the user does not have enough tokens, then it should return an error. See the tests for the details of messages.
+        3. If the amount is `0` then it returns an error.
+    2. On deleting the vault:
+        1. The `balance` amount is transferred from the module to the user.
+        1. If the module does not have enough tokens, it should panic. See the tests for the details of messages.
+    3. On updating the vault:
+        1. If the balance field in the message is higher than the current vault balance, the difference is transferred from the user to the module. And should return an error if it is not possible.
+        2. If the balance field in the message is lower than the current vault balance, the difference is transferred from the module to the user. And should panic if it is not possible.
+        3. If the balance field in the message is `0` then it returns an error, because conceptually, this should be a deletion.
+4. If your keeper function receives an error when calling the bank, it should return this error unmodified, like so:
+
+    ```go
+    err = k.bank.SendCoins...
+    if err != nil {
+        return nil, err
+    }
+    ```
+
+    This is just to make sure that you pass the tests.
+
+#### Checking it all
+
+To confirm, run:
+
+```sh
+$ go test github.com/b9lab/toll-road/x/tollroad/uservaultstudent
+```
+
+The tests are in two files:
+
+1. `x/tollroad/uservaultstudent/msg_server_user_vault_test.go` that runs unit tests with mocks. The mocks confirm that the bank was called as expected.
+2. `x/tollroad/uservaultstudent/tx_user_vault_test.go` that starts a full app. The tests also confirm that the toll-road module has the expected balance.
+
+Check in these files to see the details of what is expected.
+
+### On the subsequent part
 
 They will be disclosed at some point.
 
@@ -108,9 +234,9 @@ To prepare your working copy:
 
 3. You can keep `push`ing as many further commits as you want before the deadline.
 
-### Subsequent parts
+### Subsequent part
 
-When new parts are disclosed, you will see a [merge request](../../merge_requests) from the upstream repository towards your personal repository. When you are ready to work on the next parts, you can simply merge the MR. There should not be any conflict if you did not modify files mentioned in `fileconfig.yml`.
+When the last part is disclosed, you will see a [merge request](../../merge_requests) from the upstream repository towards your personal repository. When you are ready to work on the next parts, you can simply merge the MR. There should not be any conflict if you did not modify files mentioned in `fileconfig.yml`.
 
 Note that even after accepting a merge request, you can still work on the previous parts of the exercise. It is only a disclosure mechanism, it does not freeze previous scores in any way.
 

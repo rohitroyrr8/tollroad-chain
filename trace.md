@@ -11,3 +11,6 @@ Built with Ignite v0.22.1.
 * Remove `index` from `MsgCreateRoadOperator`, and change Protobuf indices. Add `string index` to `MsgCreateRoadOperatorResponse`.
 * Run `docker run --rm -it -v $(pwd):/exam -w /exam exam_i ignite chain serve` and stop.
 * Fix compilation and test errors around missing `Index`.
+* Create a `BankEscrowKeeper` in `types/expected_keepers.go`.
+* Run `docker run --rm -it -v $(pwd):/exam -w /exam exam_i mockgen -source=x/tollroad/types/expected_keepers.go -destination=testutil/mock_types/expected_keepers.go`.
+* Delete the `BankEscrowKeeper`.
