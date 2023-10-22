@@ -2,7 +2,7 @@
 
 You should read this whole page before attacking the problem, including the part about Docker and your working copy.
 
-The exercise is divided into 4 parts that you should take in order. The 4 parts of the exercise are disclosed bit by bit, and here are the 1st, 2nd and 3rd parts. The 4 parts are for the same project, this project.
+The exercise is divided into 4 parts that you should take in order. The 4 parts of the exercise were disclosed bit by bit, and here are all 4 parts parts. The 4 parts are for the same project, this project.
 
 This is the beginning of a larger project dedicated to the future payments of [toll roads](https://en.wikipedia.org/wiki/Toll_road). The project, built with Ignite 0.22.1 and CosmJS 0.28.13, is far from complete.
 
@@ -22,7 +22,7 @@ However it already contains:
 
     The default behavior of the scaffolding command is to have the index of the operator come from `MsgCreateRoadOperator`. However, `index` was removed from `MsgCreateRoadOperator`. That's because when a user creates a new road operator, the user does not choose the ID. Instead, it is chosen by the system on creation. After rebuild, various compilation errors were "fixed" in a lazy way.
 
-3. More actions to be disclosed in the subsequent part.
+3. The third-party Protobuf files necessary to compile to Typescript. And the Protobuf compiler executable. Some incopmlete CosmJS Typescript files.
 
 ## Do now
 
@@ -46,7 +46,7 @@ The following steps are in order of increasing difficulty:
 1. Adjustments on system info.
 2. Adjustments on road operators.
 3. Add a new store type: User vaults.
-4. More actions to be disclosed in the subsequent part.
+4. Compile the Protobuf files to Typescript and complete the missing parts in the incomplete CosmJS files.
 
 The tests have been divided into different packages to avoid compilation errors while your project is incomplete.
 
@@ -202,9 +202,35 @@ The tests are in two files:
 
 Check in these files to see the details of what is expected.
 
-### On the subsequent part
+### On CosmJS
 
-They will be disclosed at some point.
+Start by compiling the Protobuf files into Typescript.
+
+* The necessary third party files are already there. For instance [`proto/google/api/annotations.proto`](proto/google/api/annotations.proto).
+* The [`protoc`](Dockerfile-exam#L41) executable is in your Docker image. It works if you are on an Intel 64 bits or Apple M1 platform. In particular, if you are using another platform, you will have to adjust `Dockerfile-exam` or download `protoc` for [your local environment](https://github.com/protocolbuffers/protobuf/releases/tag/v21.7). After you have built the image, confirm that it works with:
+
+```sh
+$ docker run --rm -it exam_i protoc
+```
+
+To confirm that you generated the correct Typescript files, confirm there are no compilation errors in [`queries.ts`](client/src/modules/tollroad/queries.ts).
+
+With the objects created, you can move to the task of filling in the missing parts in the following files:
+
+* [`client/src/types/tollroad/events.ts`](client/src/types/tollroad/events.ts) has functions that throw `"Not implemented"`.
+* [`client/src/modules/tollroad/queries.ts`](client/src/modules/tollroad/queries.ts) has a function that throws `"Not implemented"`.
+* [`client/src/types/tollroad/messages.ts`](client/src/types/tollroad/messages.ts) has missing message objects.
+* [`client/src/tollroad_signingstargateclient.ts`](client/src/tollroad_signingstargateclient.ts) has functions that throw `"Not implemented"`.
+
+At the core, the tests are regular NPM tests: [`client/test/integration/one-run.ts`](client/test/integration/one-run.ts). However, as you can see from the many `before` clauses, it calls the Ignite faucet to populate the test accounts. So you cannot just run `npm test` as usual.
+
+You need to run [`testing-cosmjs.sh`](testing-cosmjs.sh):
+
+```sh
+$ ./testing-cosmjs.sh
+```
+
+It starts an `ignite chain serve` before `npm test`, and stops it afterwards.
 
 ## Preparing your working copy
 
@@ -236,9 +262,7 @@ To prepare your working copy:
 
 ### Subsequent part
 
-When the last part is disclosed, you will see a [merge request](../../merge_requests) from the upstream repository towards your personal repository. When you are ready to work on the next parts, you can simply merge the MR. There should not be any conflict if you did not modify files mentioned in `fileconfig.yml`.
-
-Note that even after accepting a merge request, you can still work on the previous parts of the exercise. It is only a disclosure mechanism, it does not freeze previous scores in any way.
+There are no subsequent parts.
 
 ### Deadline
 

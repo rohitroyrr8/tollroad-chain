@@ -8,6 +8,12 @@ configuration:
         - app/export.go
         - app/genesis.go
         - app/simulation_test.go
+        - client/src/util/faucet.ts
+        - client/src/util/signer.ts
+        - client/src/tollroad_stargateclient.ts
+        - client/test/integration/one-run.ts
+        - client/.env
+        - client/environment.d.ts
         - cmd/toll-roadd/main.go
         - docs/docs.go
         - proto/tollroad/params.proto

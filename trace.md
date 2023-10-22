@@ -14,3 +14,9 @@ Built with Ignite v0.22.1.
 * Create a `BankEscrowKeeper` in `types/expected_keepers.go`.
 * Run `docker run --rm -it -v $(pwd):/exam -w /exam exam_i mockgen -source=x/tollroad/types/expected_keepers.go -destination=testutil/mock_types/expected_keepers.go`.
 * Delete the `BankEscrowKeeper`.
+* Create `scripts` folder with package.
+* Download the other necessary `proto` files as per the tutorial content.
+* Add CosmJS `queries` interfaces with incomplete factory.
+* Add Stargate client for Tollroad.
+* Add incomplete CosmJS messages for Tollroad.
+* Add incomplete signing Stargate client for Tollroad.
