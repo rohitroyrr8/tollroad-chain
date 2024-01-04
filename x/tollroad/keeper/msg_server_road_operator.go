@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/b9lab/toll-road/x/tollroad/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,9 +21,20 @@ func (k msgServer) CreateRoadOperator(goCtx context.Context, msg *types.MsgCreat
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "index already set")
 	}
 
+	// Make sure that the new road operator has its ID taken from SystemInfo.
+	// Have this ID returned by the message server function.
+	// Make sure the next id in SystemInfo is incremented.
+	// Emit an event with the expected type and attributes.
+
+	systemInfo := &types.DefaultGenesis().SystemInfo
+	saveInfo, isFound := k.GetSystemInfo(ctx)
+	if isFound {
+		systemInfo = &saveInfo
+	}
+
 	var roadOperator = types.RoadOperator{
 		Creator: msg.Creator,
-		Index:   "0",
+		Index:   strconv.Itoa(int(systemInfo.NextOperatorId)),
 		Name:    msg.Name,
 		Token:   msg.Token,
 		Active:  msg.Active,
@@ -32,7 +44,19 @@ func (k msgServer) CreateRoadOperator(goCtx context.Context, msg *types.MsgCreat
 		ctx,
 		roadOperator,
 	)
-	return &types.MsgCreateRoadOperatorResponse{}, nil
+
+	systemInfo.NextOperatorId = systemInfo.NextOperatorId + 1
+	k.SetSystemInfo(ctx, *systemInfo)
+
+	ctx.EventManager().EmitEvent(sdk.NewEvent("new-road-operator-created",
+		sdk.NewAttribute("creator", roadOperator.Creator),
+		sdk.NewAttribute("road-operator-index", roadOperator.Index),
+		sdk.NewAttribute("name", roadOperator.Name),
+		sdk.NewAttribute("token", roadOperator.Token),
+		sdk.NewAttribute("active", strconv.FormatBool(msg.Active)),
+	))
+
+	return &types.MsgCreateRoadOperatorResponse{Index: roadOperator.Index}, nil
 }
 
 func (k msgServer) UpdateRoadOperator(goCtx context.Context, msg *types.MsgUpdateRoadOperator) (*types.MsgUpdateRoadOperatorResponse, error) {
