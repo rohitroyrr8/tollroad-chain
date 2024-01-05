@@ -12,6 +12,7 @@ func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		SystemInfo:       SystemInfo{NextOperatorId: DefaultIndex},
 		RoadOperatorList: []RoadOperator{},
+		UserVaultList:    []UserVault{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -29,6 +30,16 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("duplicated index for roadOperator")
 		}
 		roadOperatorIndexMap[index] = struct{}{}
+	}
+	// Check for duplicated index in userVault
+	userVaultIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.UserVaultList {
+		index := string(UserVaultKey(elem.Index))
+		if _, ok := userVaultIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for userVault")
+		}
+		userVaultIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

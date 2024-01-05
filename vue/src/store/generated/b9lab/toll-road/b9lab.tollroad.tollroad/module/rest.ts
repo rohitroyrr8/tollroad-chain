@@ -24,17 +24,33 @@ export interface TollroadMsgCreateRoadOperatorResponse {
   index?: string;
 }
 
+export type TollroadMsgCreateUserVaultResponse = object;
+
 export type TollroadMsgDeleteRoadOperatorResponse = object;
+
+export type TollroadMsgDeleteUserVaultResponse = object;
 
 export type TollroadMsgUpdateRoadOperatorResponse = object;
 
-/**
- * Params defines the parameters for the module.
- */
-export type TollroadParams = object;
+export type TollroadMsgUpdateUserVaultResponse = object;
 
 export interface TollroadQueryAllRoadOperatorResponse {
-  roadOperator?: TollroadRoadOperator[];
+  roadOperator?: TollroadtollroadRoadOperator[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
+export interface TollroadQueryAllUserVaultResponse {
+  userVault?: TollroadtollroadUserVault[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -49,11 +65,15 @@ export interface TollroadQueryAllRoadOperatorResponse {
 }
 
 export interface TollroadQueryGetRoadOperatorResponse {
-  roadOperator?: TollroadRoadOperator;
+  roadOperator?: TollroadtollroadRoadOperator;
 }
 
 export interface TollroadQueryGetSystemInfoResponse {
-  SystemInfo?: TollroadSystemInfo;
+  SystemInfo?: TollroadtollroadSystemInfo;
+}
+
+export interface TollroadQueryGetUserVaultResponse {
+  userVault?: TollroadtollroadUserVault;
 }
 
 /**
@@ -61,10 +81,15 @@ export interface TollroadQueryGetSystemInfoResponse {
  */
 export interface TollroadQueryParamsResponse {
   /** params holds all the parameters of this module. */
-  params?: TollroadParams;
+  params?: TollroadtollroadParams;
 }
 
-export interface TollroadRoadOperator {
+/**
+ * Params defines the parameters for the module.
+ */
+export type TollroadtollroadParams = object;
+
+export interface TollroadtollroadRoadOperator {
   index?: string;
   name?: string;
   token?: string;
@@ -72,9 +97,20 @@ export interface TollroadRoadOperator {
   creator?: string;
 }
 
-export interface TollroadSystemInfo {
+export interface TollroadtollroadSystemInfo {
   /** @format uint64 */
   nextOperatorId?: string;
+}
+
+export interface TollroadtollroadUserVault {
+  index?: string;
+  owner?: string;
+  roadOperatorIndex?: string;
+  token?: string;
+
+  /** @format uint64 */
+  balance?: string;
+  creator?: string;
 }
 
 /**
@@ -405,6 +441,48 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   querySystemInfo = (params: RequestParams = {}) =>
     this.request<TollroadQueryGetSystemInfoResponse, RpcStatus>({
       path: `/b9lab/toll-road/tollroad/system_info`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryUserVaultAll
+   * @summary Queries a list of UserVault items.
+   * @request GET:/b9lab/toll-road/tollroad/user_vault
+   */
+  queryUserVaultAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<TollroadQueryAllUserVaultResponse, RpcStatus>({
+      path: `/b9lab/toll-road/tollroad/user_vault`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryUserVault
+   * @summary Queries a UserVault by index.
+   * @request GET:/b9lab/toll-road/tollroad/user_vault/{index}
+   */
+  queryUserVault = (index: string, params: RequestParams = {}) =>
+    this.request<TollroadQueryGetUserVaultResponse, RpcStatus>({
+      path: `/b9lab/toll-road/tollroad/user_vault/${index}`,
       method: "GET",
       format: "json",
       ...params,

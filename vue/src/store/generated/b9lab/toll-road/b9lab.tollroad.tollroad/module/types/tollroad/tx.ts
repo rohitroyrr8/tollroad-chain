@@ -1,5 +1,6 @@
 /* eslint-disable */
-import { Reader, Writer } from "protobufjs/minimal";
+import { Reader, util, configure, Writer } from "protobufjs/minimal";
+import * as Long from "long";
 
 export const protobufPackage = "b9lab.tollroad.tollroad";
 
@@ -30,6 +31,35 @@ export interface MsgDeleteRoadOperator {
 }
 
 export interface MsgDeleteRoadOperatorResponse {}
+
+export interface MsgCreateUserVault {
+  creator: string;
+  index: string;
+  owner: string;
+  roadOperatorIndex: string;
+  token: string;
+  balance: number;
+}
+
+export interface MsgCreateUserVaultResponse {}
+
+export interface MsgUpdateUserVault {
+  creator: string;
+  index: string;
+  owner: string;
+  roadOperatorIndex: string;
+  token: string;
+  balance: number;
+}
+
+export interface MsgUpdateUserVaultResponse {}
+
+export interface MsgDeleteUserVault {
+  creator: string;
+  index: string;
+}
+
+export interface MsgDeleteUserVaultResponse {}
 
 const baseMsgCreateRoadOperator: object = {
   creator: "",
@@ -531,6 +561,551 @@ export const MsgDeleteRoadOperatorResponse = {
   },
 };
 
+const baseMsgCreateUserVault: object = {
+  creator: "",
+  index: "",
+  owner: "",
+  roadOperatorIndex: "",
+  token: "",
+  balance: 0,
+};
+
+export const MsgCreateUserVault = {
+  encode(
+    message: MsgCreateUserVault,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.index !== "") {
+      writer.uint32(18).string(message.index);
+    }
+    if (message.owner !== "") {
+      writer.uint32(26).string(message.owner);
+    }
+    if (message.roadOperatorIndex !== "") {
+      writer.uint32(34).string(message.roadOperatorIndex);
+    }
+    if (message.token !== "") {
+      writer.uint32(42).string(message.token);
+    }
+    if (message.balance !== 0) {
+      writer.uint32(48).uint64(message.balance);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgCreateUserVault {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgCreateUserVault } as MsgCreateUserVault;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.index = reader.string();
+          break;
+        case 3:
+          message.owner = reader.string();
+          break;
+        case 4:
+          message.roadOperatorIndex = reader.string();
+          break;
+        case 5:
+          message.token = reader.string();
+          break;
+        case 6:
+          message.balance = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgCreateUserVault {
+    const message = { ...baseMsgCreateUserVault } as MsgCreateUserVault;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.index !== undefined && object.index !== null) {
+      message.index = String(object.index);
+    } else {
+      message.index = "";
+    }
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = String(object.owner);
+    } else {
+      message.owner = "";
+    }
+    if (
+      object.roadOperatorIndex !== undefined &&
+      object.roadOperatorIndex !== null
+    ) {
+      message.roadOperatorIndex = String(object.roadOperatorIndex);
+    } else {
+      message.roadOperatorIndex = "";
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = String(object.token);
+    } else {
+      message.token = "";
+    }
+    if (object.balance !== undefined && object.balance !== null) {
+      message.balance = Number(object.balance);
+    } else {
+      message.balance = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgCreateUserVault): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.index !== undefined && (obj.index = message.index);
+    message.owner !== undefined && (obj.owner = message.owner);
+    message.roadOperatorIndex !== undefined &&
+      (obj.roadOperatorIndex = message.roadOperatorIndex);
+    message.token !== undefined && (obj.token = message.token);
+    message.balance !== undefined && (obj.balance = message.balance);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgCreateUserVault>): MsgCreateUserVault {
+    const message = { ...baseMsgCreateUserVault } as MsgCreateUserVault;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.index !== undefined && object.index !== null) {
+      message.index = object.index;
+    } else {
+      message.index = "";
+    }
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    } else {
+      message.owner = "";
+    }
+    if (
+      object.roadOperatorIndex !== undefined &&
+      object.roadOperatorIndex !== null
+    ) {
+      message.roadOperatorIndex = object.roadOperatorIndex;
+    } else {
+      message.roadOperatorIndex = "";
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = object.token;
+    } else {
+      message.token = "";
+    }
+    if (object.balance !== undefined && object.balance !== null) {
+      message.balance = object.balance;
+    } else {
+      message.balance = 0;
+    }
+    return message;
+  },
+};
+
+const baseMsgCreateUserVaultResponse: object = {};
+
+export const MsgCreateUserVaultResponse = {
+  encode(
+    _: MsgCreateUserVaultResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgCreateUserVaultResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgCreateUserVaultResponse,
+    } as MsgCreateUserVaultResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgCreateUserVaultResponse {
+    const message = {
+      ...baseMsgCreateUserVaultResponse,
+    } as MsgCreateUserVaultResponse;
+    return message;
+  },
+
+  toJSON(_: MsgCreateUserVaultResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(
+    _: DeepPartial<MsgCreateUserVaultResponse>
+  ): MsgCreateUserVaultResponse {
+    const message = {
+      ...baseMsgCreateUserVaultResponse,
+    } as MsgCreateUserVaultResponse;
+    return message;
+  },
+};
+
+const baseMsgUpdateUserVault: object = {
+  creator: "",
+  index: "",
+  owner: "",
+  roadOperatorIndex: "",
+  token: "",
+  balance: 0,
+};
+
+export const MsgUpdateUserVault = {
+  encode(
+    message: MsgUpdateUserVault,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.index !== "") {
+      writer.uint32(18).string(message.index);
+    }
+    if (message.owner !== "") {
+      writer.uint32(26).string(message.owner);
+    }
+    if (message.roadOperatorIndex !== "") {
+      writer.uint32(34).string(message.roadOperatorIndex);
+    }
+    if (message.token !== "") {
+      writer.uint32(42).string(message.token);
+    }
+    if (message.balance !== 0) {
+      writer.uint32(48).uint64(message.balance);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgUpdateUserVault {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgUpdateUserVault } as MsgUpdateUserVault;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.index = reader.string();
+          break;
+        case 3:
+          message.owner = reader.string();
+          break;
+        case 4:
+          message.roadOperatorIndex = reader.string();
+          break;
+        case 5:
+          message.token = reader.string();
+          break;
+        case 6:
+          message.balance = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgUpdateUserVault {
+    const message = { ...baseMsgUpdateUserVault } as MsgUpdateUserVault;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.index !== undefined && object.index !== null) {
+      message.index = String(object.index);
+    } else {
+      message.index = "";
+    }
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = String(object.owner);
+    } else {
+      message.owner = "";
+    }
+    if (
+      object.roadOperatorIndex !== undefined &&
+      object.roadOperatorIndex !== null
+    ) {
+      message.roadOperatorIndex = String(object.roadOperatorIndex);
+    } else {
+      message.roadOperatorIndex = "";
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = String(object.token);
+    } else {
+      message.token = "";
+    }
+    if (object.balance !== undefined && object.balance !== null) {
+      message.balance = Number(object.balance);
+    } else {
+      message.balance = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgUpdateUserVault): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.index !== undefined && (obj.index = message.index);
+    message.owner !== undefined && (obj.owner = message.owner);
+    message.roadOperatorIndex !== undefined &&
+      (obj.roadOperatorIndex = message.roadOperatorIndex);
+    message.token !== undefined && (obj.token = message.token);
+    message.balance !== undefined && (obj.balance = message.balance);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgUpdateUserVault>): MsgUpdateUserVault {
+    const message = { ...baseMsgUpdateUserVault } as MsgUpdateUserVault;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.index !== undefined && object.index !== null) {
+      message.index = object.index;
+    } else {
+      message.index = "";
+    }
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    } else {
+      message.owner = "";
+    }
+    if (
+      object.roadOperatorIndex !== undefined &&
+      object.roadOperatorIndex !== null
+    ) {
+      message.roadOperatorIndex = object.roadOperatorIndex;
+    } else {
+      message.roadOperatorIndex = "";
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = object.token;
+    } else {
+      message.token = "";
+    }
+    if (object.balance !== undefined && object.balance !== null) {
+      message.balance = object.balance;
+    } else {
+      message.balance = 0;
+    }
+    return message;
+  },
+};
+
+const baseMsgUpdateUserVaultResponse: object = {};
+
+export const MsgUpdateUserVaultResponse = {
+  encode(
+    _: MsgUpdateUserVaultResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgUpdateUserVaultResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgUpdateUserVaultResponse,
+    } as MsgUpdateUserVaultResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgUpdateUserVaultResponse {
+    const message = {
+      ...baseMsgUpdateUserVaultResponse,
+    } as MsgUpdateUserVaultResponse;
+    return message;
+  },
+
+  toJSON(_: MsgUpdateUserVaultResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(
+    _: DeepPartial<MsgUpdateUserVaultResponse>
+  ): MsgUpdateUserVaultResponse {
+    const message = {
+      ...baseMsgUpdateUserVaultResponse,
+    } as MsgUpdateUserVaultResponse;
+    return message;
+  },
+};
+
+const baseMsgDeleteUserVault: object = { creator: "", index: "" };
+
+export const MsgDeleteUserVault = {
+  encode(
+    message: MsgDeleteUserVault,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.index !== "") {
+      writer.uint32(18).string(message.index);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgDeleteUserVault {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgDeleteUserVault } as MsgDeleteUserVault;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.index = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgDeleteUserVault {
+    const message = { ...baseMsgDeleteUserVault } as MsgDeleteUserVault;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.index !== undefined && object.index !== null) {
+      message.index = String(object.index);
+    } else {
+      message.index = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgDeleteUserVault): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.index !== undefined && (obj.index = message.index);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgDeleteUserVault>): MsgDeleteUserVault {
+    const message = { ...baseMsgDeleteUserVault } as MsgDeleteUserVault;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.index !== undefined && object.index !== null) {
+      message.index = object.index;
+    } else {
+      message.index = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgDeleteUserVaultResponse: object = {};
+
+export const MsgDeleteUserVaultResponse = {
+  encode(
+    _: MsgDeleteUserVaultResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgDeleteUserVaultResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgDeleteUserVaultResponse,
+    } as MsgDeleteUserVaultResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgDeleteUserVaultResponse {
+    const message = {
+      ...baseMsgDeleteUserVaultResponse,
+    } as MsgDeleteUserVaultResponse;
+    return message;
+  },
+
+  toJSON(_: MsgDeleteUserVaultResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(
+    _: DeepPartial<MsgDeleteUserVaultResponse>
+  ): MsgDeleteUserVaultResponse {
+    const message = {
+      ...baseMsgDeleteUserVaultResponse,
+    } as MsgDeleteUserVaultResponse;
+    return message;
+  },
+};
+
 /** Msg defines the Msg service. */
 export interface Msg {
   CreateRoadOperator(
@@ -539,10 +1114,19 @@ export interface Msg {
   UpdateRoadOperator(
     request: MsgUpdateRoadOperator
   ): Promise<MsgUpdateRoadOperatorResponse>;
-  /** this line is used by starport scaffolding # proto/tx/rpc */
   DeleteRoadOperator(
     request: MsgDeleteRoadOperator
   ): Promise<MsgDeleteRoadOperatorResponse>;
+  CreateUserVault(
+    request: MsgCreateUserVault
+  ): Promise<MsgCreateUserVaultResponse>;
+  UpdateUserVault(
+    request: MsgUpdateUserVault
+  ): Promise<MsgUpdateUserVaultResponse>;
+  /** this line is used by starport scaffolding # proto/tx/rpc */
+  DeleteUserVault(
+    request: MsgDeleteUserVault
+  ): Promise<MsgDeleteUserVaultResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -591,6 +1175,48 @@ export class MsgClientImpl implements Msg {
       MsgDeleteRoadOperatorResponse.decode(new Reader(data))
     );
   }
+
+  CreateUserVault(
+    request: MsgCreateUserVault
+  ): Promise<MsgCreateUserVaultResponse> {
+    const data = MsgCreateUserVault.encode(request).finish();
+    const promise = this.rpc.request(
+      "b9lab.tollroad.tollroad.Msg",
+      "CreateUserVault",
+      data
+    );
+    return promise.then((data) =>
+      MsgCreateUserVaultResponse.decode(new Reader(data))
+    );
+  }
+
+  UpdateUserVault(
+    request: MsgUpdateUserVault
+  ): Promise<MsgUpdateUserVaultResponse> {
+    const data = MsgUpdateUserVault.encode(request).finish();
+    const promise = this.rpc.request(
+      "b9lab.tollroad.tollroad.Msg",
+      "UpdateUserVault",
+      data
+    );
+    return promise.then((data) =>
+      MsgUpdateUserVaultResponse.decode(new Reader(data))
+    );
+  }
+
+  DeleteUserVault(
+    request: MsgDeleteUserVault
+  ): Promise<MsgDeleteUserVaultResponse> {
+    const data = MsgDeleteUserVault.encode(request).finish();
+    const promise = this.rpc.request(
+      "b9lab.tollroad.tollroad.Msg",
+      "DeleteUserVault",
+      data
+    );
+    return promise.then((data) =>
+      MsgDeleteUserVaultResponse.decode(new Reader(data))
+    );
+  }
 }
 
 interface Rpc {
@@ -600,6 +1226,16 @@ interface Rpc {
     data: Uint8Array
   ): Promise<Uint8Array>;
 }
+
+declare var self: any | undefined;
+declare var window: any | undefined;
+var globalThis: any = (() => {
+  if (typeof globalThis !== "undefined") return globalThis;
+  if (typeof self !== "undefined") return self;
+  if (typeof window !== "undefined") return window;
+  if (typeof global !== "undefined") return global;
+  throw "Unable to locate global object";
+})();
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin
@@ -611,3 +1247,15 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+function longToNumber(long: Long): number {
+  if (long.gt(Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  return long.toNumber();
+}
+
+if (util.Long !== Long) {
+  util.Long = Long as any;
+  configure();
+}

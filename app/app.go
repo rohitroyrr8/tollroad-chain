@@ -170,6 +170,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		tollroadmoduletypes.ModuleName: nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -394,6 +395,7 @@ func New(
 		keys[tollroadmoduletypes.StoreKey],
 		keys[tollroadmoduletypes.MemStoreKey],
 		app.GetSubspace(tollroadmoduletypes.ModuleName),
+		app.BankKeeper,
 	)
 	tollroadModule := tollroadmodule.NewAppModule(appCodec, app.TollroadKeeper, app.AccountKeeper, app.BankKeeper)
 
